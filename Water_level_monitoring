@@ -1,0 +1,46 @@
+#define TRIG 9
+#define ECHO 10
+#define RELAY 7
+
+long duration;
+float distance;
+float tankHeight = 25.0;  // Change according to your tank height (cm)
+float waterLevel;
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(RELAY, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  // Send ultrasonic signal
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  duration = pulseIn(ECHO, HIGH);
+  distance = duration * 0.034 / 2;
+
+  waterLevel = tankHeight - distance;
+
+  Serial.print("Water Level: ");
+  Serial.print(waterLevel);
+  Serial.println(" cm");
+
+  // Pump Control Logic
+  if (waterLevel < 5) {
+    digitalWrite(RELAY, HIGH);   // Pump ON
+    Serial.println("Pump ON");
+  }
+  else if (waterLevel > 20) {
+    digitalWrite(RELAY, LOW);    // Pump OFF
+    Serial.println("Pump OFF");
+  }
+
+  delay(1000);
+}
